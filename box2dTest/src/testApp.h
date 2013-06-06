@@ -24,8 +24,16 @@ private:
     
     ofxBox2d mBox2d;
     
-    vector<ofxBox2dCircle> mCircles;
+    vector<ofxBox2dCircle> mPCircles;
     
     ofImage mImg;
+    
+    
+	vector <ofPolyline>			mPLines;
+	vector <ofxBox2dPolygon>	mPPolyLines;
+    
+    
+    // Mode Toggle
+    bool bDebugMode;
     
 };
