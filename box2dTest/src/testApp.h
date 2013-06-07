@@ -35,5 +35,6 @@ private:
     
     // Mode Toggle
     bool bDebugMode;
+    bool bForcesMode;
     
 };

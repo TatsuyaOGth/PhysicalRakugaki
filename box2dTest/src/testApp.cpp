@@ -41,6 +41,17 @@ void testApp::update(){
 	}
     
     mBox2d.update();
+
+    if (bForcesMode) {
+        ofVec2f mouse(ofGetMouseX(), ofGetMouseY());
+        float minDis = ofGetMousePressed() ? 300 : 10;
+        for(int i = 0; i < mPCircles.size(); i++) {
+            float dis = mouse.distance(mPCircles[i].getPosition());
+            if (dis < minDis) mPCircles[i].addRepulsionForce(mouse, 2);
+            else              mPCircles[i].addAttractionPoint(mouse, 4.0);
+        }
+    }
+
     
 }
 
@@ -111,9 +122,16 @@ void testApp::keyPressed(int key){
             
         case 'c':
             mPLines.clear();
-            for (int i=0; i<mPPolyLines.size(); i++) {
+            for (int i=0; i<mPPolyLines.size(); i++)
                 mPPolyLines[i].destroy();
-            }
+            break;
+            
+        case 'C':
+            mPCircles.clear();
+            break;
+            
+        case '1':
+            bForcesMode = !bForcesMode;
             break;
             
         case ' ': bDebugMode = !bDebugMode; break;
