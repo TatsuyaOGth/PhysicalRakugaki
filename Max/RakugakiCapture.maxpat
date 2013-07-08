@@ -8,7 +8,7 @@
 			"architecture" : "x86"
 		}
 ,
-		"rect" : [ 0.0, 44.0, 1280.0, 706.0 ],
+		"rect" : [ 5.0, 44.0, 1275.0, 706.0 ],
 		"bglocked" : 0,
 		"openinpresentation" : 0,
 		"default_fontsize" : 9.0,
@@ -28,6 +28,47 @@
 		"digest" : "",
 		"tags" : "",
 		"boxes" : [ 			{
+				"box" : 				{
+					"id" : "obj-46",
+					"maxclass" : "button",
+					"numinlets" : 1,
+					"numoutlets" : 1,
+					"outlettype" : [ "bang" ],
+					"patching_rect" : [ 104.0, 280.0, 32.0, 32.0 ],
+					"presentation" : 1,
+					"presentation_rect" : [ 104.0, 504.0, 24.0, 24.0 ]
+				}
+
+			}
+, 			{
+				"box" : 				{
+					"fontname" : "Geneva",
+					"fontsize" : 9.0,
+					"id" : "obj-26",
+					"maxclass" : "newobj",
+					"numinlets" : 1,
+					"numoutlets" : 2,
+					"outlettype" : [ "jit_matrix", "" ],
+					"patching_rect" : [ 120.0, 336.0, 160.0, 18.0 ],
+					"text" : "jit.matrix 4 char 640 480 @thru 0"
+				}
+
+			}
+, 			{
+				"box" : 				{
+					"bgmode" : 1,
+					"id" : "obj-24",
+					"maxclass" : "bpatcher",
+					"name" : "vz.grabbr.maxpat",
+					"numinlets" : 2,
+					"numoutlets" : 1,
+					"outlettype" : [ "jit_matrix" ],
+					"patching_rect" : [ 200.0, 136.0, 180.0, 164.0 ],
+					"prototypename" : "pixl"
+				}
+
+			}
+, 			{
 				"box" : 				{
 					"fontname" : "Geneva",
 					"fontsize" : 9.0,
@@ -54,7 +95,7 @@
 					"numoutlets" : 3,
 					"outlettype" : [ "", "", "int" ],
 					"parameter_enable" : 0,
-					"patching_rect" : [ 72.0, 384.0, 56.0, 24.0 ],
+					"patching_rect" : [ 120.0, 384.0, 56.0, 24.0 ],
 					"presentation" : 1,
 					"presentation_rect" : [ 32.0, 504.0, 56.0, 24.0 ],
 					"text" : "RESET"
@@ -1177,9 +1218,9 @@
 					"numinlets" : 1,
 					"numoutlets" : 2,
 					"outlettype" : [ "", "" ],
-					"patching_rect" : [ 688.0, 912.0, 379.0, 400.0 ],
+					"patching_rect" : [ 688.0, 912.0, 347.0, 479.0 ],
 					"presentation" : 1,
-					"presentation_rect" : [ 24.0, 1080.0, 379.0, 400.0 ]
+					"presentation_rect" : [ 24.0, 1080.0, 347.0, 479.0 ]
 				}
 
 			}
@@ -1873,10 +1914,28 @@
 			}
 , 			{
 				"patchline" : 				{
+					"destination" : [ "obj-26", 0 ],
+					"disabled" : 0,
+					"hidden" : 0,
+					"source" : [ "obj-24", 0 ]
+				}
+
+			}
+, 			{
+				"patchline" : 				{
 					"destination" : [ "obj-6", 0 ],
 					"disabled" : 0,
 					"hidden" : 0,
 					"source" : [ "obj-25", 0 ]
+				}
+
+			}
+, 			{
+				"patchline" : 				{
+					"destination" : [ "obj-22", 0 ],
+					"disabled" : 0,
+					"hidden" : 0,
+					"source" : [ "obj-26", 0 ]
 				}
 
 			}
@@ -2026,6 +2085,15 @@
 			}
 , 			{
 				"patchline" : 				{
+					"destination" : [ "obj-26", 0 ],
+					"disabled" : 0,
+					"hidden" : 0,
+					"source" : [ "obj-46", 0 ]
+				}
+
+			}
+, 			{
+				"patchline" : 				{
 					"destination" : [ "obj-53", 0 ],
 					"disabled" : 0,
 					"hidden" : 0,
@@ -2154,9 +2222,44 @@
  ],
 		"dependency_cache" : [ 			{
 				"name" : "settings",
-				"bootpath" : "/Users/tatsuyaogusu/Documents/Wasedanomori_2013/Programs",
+				"bootpath" : "/Users/tatsuyaogusu/Documents/Programs/openFrameworks/of_v0074/apps/PhysicalRakugaki/Max",
 				"patcherrelativepath" : "./",
 				"type" : "TEXT",
+				"implicit" : 1
+			}
+, 			{
+				"name" : "vz.grabbr.maxpat",
+				"bootpath" : "/Applications/Max 6.1/packages/vizzie/patchers",
+				"patcherrelativepath" : "../../../../../../../../../Applications/Max 6.1/packages/vizzie/patchers",
+				"type" : "JSON",
+				"implicit" : 1
+			}
+, 			{
+				"name" : "xplatform-grab.maxpat",
+				"bootpath" : "/Applications/Max 6.1/packages/vizzie/patchers",
+				"patcherrelativepath" : "../../../../../../../../../Applications/Max 6.1/packages/vizzie/patchers",
+				"type" : "JSON",
+				"implicit" : 1
+			}
+, 			{
+				"name" : "playr-transport.png",
+				"bootpath" : "/Applications/Max 6.1/packages/vizzie/patchers",
+				"patcherrelativepath" : "../../../../../../../../../Applications/Max 6.1/packages/vizzie/patchers",
+				"type" : "PNG ",
+				"implicit" : 1
+			}
+, 			{
+				"name" : "pvr-data-button.png",
+				"bootpath" : "/Applications/Max 6.1/packages/vizzie/patchers",
+				"patcherrelativepath" : "../../../../../../../../../Applications/Max 6.1/packages/vizzie/patchers",
+				"type" : "PNG ",
+				"implicit" : 1
+			}
+, 			{
+				"name" : "data-handler.maxpat",
+				"bootpath" : "/Applications/Max 6.1/packages/vizzie/patchers",
+				"patcherrelativepath" : "../../../../../../../../../Applications/Max 6.1/packages/vizzie/patchers",
+				"type" : "JSON",
 				"implicit" : 1
 			}
 , 			{
