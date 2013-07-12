@@ -5,6 +5,16 @@
 #include "ofxBox2d.h"
 #include "ofxTrueTypeFontUC.h"
 
+/**
+ MODE
+ */
+enum mode {
+    TEST_MODE = 0,
+    TITLE,
+    RAIN_DROP,
+    SNOW_FALL
+};
+
 class testApp : public ofBaseApp{
 public:
     void setup();
@@ -56,12 +66,6 @@ private:
     vector<ofImage> mRakugakis;
     
     //view mode
-    enum mode {
-        TEST_MODE = 0,
-        TITLE,
-        RAIN_DROP,
-        SNOW_FALL
-    };
     bool bDebugView;
     mode mMode;
     bitset<9> bFunc;

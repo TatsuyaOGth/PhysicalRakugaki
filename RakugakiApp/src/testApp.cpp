@@ -26,24 +26,6 @@ void testApp::setup(){
     mFont.loadFont("ComicSansMS.ttf", 80);
 }
 
-void testApp::setupRain()
-{
-    mPsCircles.clear();
-    mBox2d.init();
-    mBox2d.setGravity(0, 10);
-//	mBox2d.createGround();
-	mBox2d.setFPS(24.0);
-}
-
-void testApp::setupSnow()
-{
-    mPsCircles.clear();
-    mBox2d.init();
-    mBox2d.setGravity(0, 1);
-    mBox2d.createGround();
-	mBox2d.setFPS(24.0);
-}
-
 //--------------------------------------------------------------
 void testApp::update(){
     switch (mMode) {
@@ -63,32 +45,6 @@ void testApp::update(){
     }
     mBox2d.update();
 
-}
-
-void testApp::updateTitle()
-{
-}
-
-void testApp::updateRain()
-{
-    if((int)ofRandom(0, 2) == 0) {
-		psCircle c;
-        c.ID = (int)ofRandom(mRakugakis.size());
-		c.circle.setPhysics(1, 0.5, 0.1);
-		c.circle.setup(mBox2d.getWorld(), ofRandom(ofGetWidth()), -100, ofRandom(3, 10));
-		mPsCircles.push_back(c);
-	}
-}
-
-void testApp::updateSnow()
-{
-    if((int)ofRandom(0, 3) == 0) {
-		psCircle c;
-        c.ID = (int)ofRandom(mRakugakis.size());
-		c.circle.setPhysics(1, 0.2, 0.8);
-		c.circle.setup(mBox2d.getWorld(), ofRandom(ofGetWidth()), -100, ofRandom(3, 10));
-		mPsCircles.push_back(c);
-	}
 }
 
 //--------------------------------------------------------------
@@ -124,6 +80,56 @@ void testApp::draw(){
         ofDrawBitmapString(s.str(), 10, 40);
     }
 }
+
+//============================================================== setup
+
+void testApp::setupRain()
+{
+    mPsCircles.clear();
+    mBox2d.init();
+    mBox2d.setGravity(0, 10);
+    //	mBox2d.createGround();
+	mBox2d.setFPS(24.0);
+}
+
+void testApp::setupSnow()
+{
+    mPsCircles.clear();
+    mBox2d.init();
+    mBox2d.setGravity(0, 1);
+    mBox2d.createGround();
+	mBox2d.setFPS(24.0);
+}
+
+//============================================================== update
+
+void testApp::updateTitle()
+{
+}
+
+void testApp::updateRain()
+{
+    if((int)ofRandom(0, 2) == 0) {
+		psCircle c;
+        c.ID = (int)ofRandom(mRakugakis.size());
+		c.circle.setPhysics(1, 0.5, 0.1);
+		c.circle.setup(mBox2d.getWorld(), ofRandom(ofGetWidth()), -100, ofRandom(3, 10));
+		mPsCircles.push_back(c);
+	}
+}
+
+void testApp::updateSnow()
+{
+    if((int)ofRandom(0, 3) == 0) {
+		psCircle c;
+        c.ID = (int)ofRandom(mRakugakis.size());
+		c.circle.setPhysics(1, 0.2, 0.8);
+		c.circle.setup(mBox2d.getWorld(), ofRandom(ofGetWidth()), -100, ofRandom(3, 10));
+		mPsCircles.push_back(c);
+	}
+}
+
+//============================================================== draw
 
 void testApp::drawTitle()
 {
@@ -244,7 +250,7 @@ void testApp::mouseReleased(int x, int y, int button){
 
 //--------------------------------------------------------------
 void testApp::windowResized(int w, int h){
-    //set each mode
+    //画面サイズが変更されたら初期化する
     switch (mMode) {
         case TEST_MODE:
             break;
