@@ -1,1 +1,1 @@
-ofxBox2d
+ofxBox2d https://github.com/vanderlin/ofxBox2d.git

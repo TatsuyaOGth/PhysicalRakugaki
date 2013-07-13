@@ -17,6 +17,8 @@ data/
 *.m4v
 *.avi
 bin/
+obj/
+!bin/data
 build/
 temp/
 data
