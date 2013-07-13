@@ -4,6 +4,6 @@ ofxOpenCv
 ofxOsc
 ofxXmlSettings
 ofxBox2d
-ofxControlPanel
-ofxKinect
+ofxControlPanel https://github.com/kylemcdonald/ofxControlPanel.git
+ofxKinect https://github.com/ofTheo/ofxKinect.git
 ofxOgsn
