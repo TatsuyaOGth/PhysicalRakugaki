@@ -1,5 +1,6 @@
 #include "testApp.h"
 
+
 //--------------------------------------------------------------
 void testApp::setup(){
     ofEnableAlphaBlending();
@@ -7,6 +8,17 @@ void testApp::setup(){
     ofSetLogLevel(OF_LOG_NOTICE);
     ofBackground(24, 80, 65);
 //    ofSetWindowShape(1024, 768);
+    
+    //----------
+    // GUI setup
+    //----------
+    gui.setup("Controller", 0, 0, 300, 240);
+    gui.setXMLFilename("gui_setting_" + ofToString(TEST_MODE));
+    gui.setMinimized(true);
+    gui.addPanel("settings", 1);
+    gui.addSlider(GUI_SLIDER_01, GUI_SLIDER_01, 0.5, 0.0, 1.0, false);
+    gui.addSlider(GUI_SLIDER_02, GUI_SLIDER_02, 0.5, 0.0, 1.0, false);
+    gui.addSlider(GUI_SLIDER_03, GUI_SLIDER_03, 0.5, 0.0, 1.0, false);
     
     //----------
     // Box2d setup
@@ -42,9 +54,13 @@ void testApp::update(){
         case SNOW_FALL:
             updateSnow();
             break;
+            
+        case JUMP:
+            updateJump();
+            break;
     }
     mBox2d.update();
-
+    gui.update();
 }
 
 //--------------------------------------------------------------
@@ -65,6 +81,10 @@ void testApp::draw(){
         case SNOW_FALL:
             drawSnow();
             break;
+            
+        case JUMP:
+            drawJump();
+            break;
     }
     
     //----------
@@ -77,7 +97,8 @@ void testApp::draw(){
         s << "physic circles: " << mPsCircles.size() << endl;
         s << "mode: " << mMode << endl;
         for (int i = 0; i < bFunc.size(); i++) s << "func " << i << ": " << bFunc[i] << endl;
-        ofDrawBitmapString(s.str(), 10, 40);
+        ofDrawBitmapString(s.str(), 10, 35);
+        gui.draw();
     }
 }
 
@@ -90,6 +111,7 @@ void testApp::setupRain()
     mBox2d.setGravity(0, 10);
     //	mBox2d.createGround();
 	mBox2d.setFPS(24.0);
+    gui.loadSettings(getGuiFileName());
 }
 
 void testApp::setupSnow()
@@ -99,6 +121,17 @@ void testApp::setupSnow()
     mBox2d.setGravity(0, 1);
     mBox2d.createGround();
 	mBox2d.setFPS(24.0);
+    gui.loadSettings(getGuiFileName());
+}
+
+void testApp::setupJump()
+{
+    mPsCircles.clear();
+    mBox2d.init();
+    mBox2d.setGravity(0, 3);
+//    mBox2d.createGround();
+	mBox2d.setFPS(24.0);
+    gui.loadSettings(getGuiFileName());
 }
 
 //============================================================== update
@@ -125,6 +158,22 @@ void testApp::updateSnow()
         c.ID = (int)ofRandom(mRakugakis.size());
 		c.circle.setPhysics(1, 0.2, 0.8);
 		c.circle.setup(mBox2d.getWorld(), ofRandom(ofGetWidth()), -100, ofRandom(3, 10));
+        c.circle.setVelocity(ofRandom(-1, 1), 0);
+		mPsCircles.push_back(c);
+	}
+}
+
+void testApp::updateJump()
+{
+    if((int)ofRandom(0, 10) == 0) {
+        int jumpV = (int)(gui.getValueF(GUI_SLIDER_01) * 15);
+        float xV = gui.getValueF(GUI_SLIDER_02) * 5;
+        
+		psCircle c;
+        c.ID = (int)ofRandom(mRakugakis.size());
+		c.circle.setPhysics(1, 0.8, 0.2);
+		c.circle.setup(mBox2d.getWorld(), ofRandom(ofGetWidth()), ofGetHeight(), ofRandom(20, 30));
+        c.circle.setVelocity(ofRandom(-xV, xV), -jumpV); //pop up
 		mPsCircles.push_back(c);
 	}
 }
@@ -164,8 +213,25 @@ void testApp::drawSnow()
         }
         if ((*it).circle.getPosition().y + (*it).circle.getRadius() >= ofGetHeight()-10) (*it).touch = true;
         if ((*it).touch) {
-            (*it).circle.setRadius((*it).circle.getRadius() - 0.05);
-            (*it).minusLifeTime();
+            (*it).circle.setRadius((*it).circle.getRadius() - 0.1);
+            it->life -= 1;
+        }
+        //delete
+        if ((*it).circle.getRadius() <= 0) {
+            it = mPsCircles.erase(it);
+        } else {
+            it++;
+        }
+    }
+}
+
+void testApp::drawJump()
+{
+    vector<psCircle>::iterator it = mPsCircles.begin();
+    while (it != mPsCircles.end()) {
+        if (bDebugView) {
+            ofSetColor(255, 255, 255);
+            (*it).circle.draw();
         }
         //delete
         if ((*it).circle.getRadius() <= 0) {
@@ -203,7 +269,7 @@ void testApp::keyPressed(int key){
         case '2': mMode = TITLE; break;
         case '3': mMode = RAIN_DROP; setupRain(); break;
         case '4': mMode = SNOW_FALL; setupSnow(); break;
-        case '5':  break;
+        case '5': mMode = JUMP; setupJump(); break;
         case '6':  break;
         case '7':  break;
         case '8':  break;
@@ -221,6 +287,9 @@ void testApp::keyPressed(int key){
         case '(': bFunc[7] = !bFunc[7]; break;
         case ')': bFunc[8] = !bFunc[8]; break;
     }
+    
+    // set gui file name
+    gui.setXMLFilename(getGuiFileName());
 }
 
 //--------------------------------------------------------------
@@ -230,22 +299,22 @@ void testApp::keyReleased(int key){
 
 //--------------------------------------------------------------
 void testApp::mouseMoved(int x, int y ){
-
 }
 
 //--------------------------------------------------------------
 void testApp::mouseDragged(int x, int y, int button){
-
+    gui.mouseDragged(x, y, button);
 }
 
 //--------------------------------------------------------------
 void testApp::mousePressed(int x, int y, int button){
-
+    gui.mousePressed(x, y, button);
 }
 
 //--------------------------------------------------------------
 void testApp::mouseReleased(int x, int y, int button){
-
+    gui.mouseReleased();
+    gui.saveSettings(); //audo save
 }
 
 //--------------------------------------------------------------
@@ -265,6 +334,10 @@ void testApp::windowResized(int w, int h){
         case SNOW_FALL:
             setupSnow();
             break;
+            
+        case JUMP:
+            setupJump();
+            break;
     }
 }
 
@@ -276,4 +349,10 @@ void testApp::gotMessage(ofMessage msg){
 //--------------------------------------------------------------
 void testApp::dragEvent(ofDragInfo dragInfo){ 
 
+}
+
+//--------------------------------------------------------------
+string testApp::getGuiFileName()
+{
+    return "gui_settings_" + ofToString(mMode) + ".xml";
 }

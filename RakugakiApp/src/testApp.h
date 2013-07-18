@@ -4,6 +4,14 @@
 #include "ofxOgsn.h"
 #include "ofxBox2d.h"
 #include "ofxTrueTypeFontUC.h"
+#include "ofxXmlSettings.h"
+#include "ofxControlPanel.h"
+
+//Control Panel Propaty
+//各コントローラは各モード毎の設定を与える型として使用
+static const string GUI_SLIDER_01 = "slider_01";
+static const string GUI_SLIDER_02 = "slider_02";
+static const string GUI_SLIDER_03 = "slider_03";
 
 /**
  MODE
@@ -12,7 +20,8 @@ enum mode {
     TEST_MODE = 0,
     TITLE,
     RAIN_DROP,
-    SNOW_FALL
+    SNOW_FALL,
+    JUMP
 };
 
 class testApp : public ofBaseApp{
@@ -30,32 +39,36 @@ public:
     void windowResized(int w, int h);
     void dragEvent(ofDragInfo dragInfo);
     void gotMessage(ofMessage msg);
-    
+        
     //=== Each Update ===
     void setupRain();
     void setupSnow();
+    void setupJump();
     
     //=== Each Update ===
     void updateTitle();
     void updateRain();
     void updateSnow();
+    void updateJump();
     
     //=== Each Draw ===
     void drawTitle();
     void drawRain();
     void drawSnow();
+    void drawJump();
     
 private:
     
-    //Box2D
+    string getGuiFileName();
+    
     ofxBox2d mBox2d;
+    ofxControlPanel gui;
     
     typedef struct _psCircle {
         unsigned int ID = 0;
         bool touch = false;
         int life = 255;
         ofxBox2dCircle circle;
-        int minusLifeTime(){ life--; return life; }
     } psCircle;
     vector<psCircle> mPsCircles;
     
