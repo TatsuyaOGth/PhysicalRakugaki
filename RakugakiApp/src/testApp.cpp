@@ -30,6 +30,8 @@ void testApp::setup(){
     //mBox2d.createBounds();
     //mBox2d.registerGrabbing();
     
+    getAndSetRakugaki("rakugaki_test");
+    
     bDebugView = true;
     mMode = TEST_MODE;
     for (int i = 0; i < 9; i++) bFunc[i] = 0;
@@ -93,9 +95,11 @@ void testApp::draw(){
     if (bDebugView) {
         ofSetColor(255);
         stringstream s;
-        s << "FPS: " << ofToString(ofGetFrameRate(), 2) << endl;
+        s << "fps: " << ofToString(ofGetFrameRate(), 2) << endl;
+        s << "window size: " << ofGetWidth() << " " << ofGetHeight() << endl;
         s << "physic circles: " << mPsCircles.size() << endl;
-        s << "mode: " << mMode << endl;
+        s << "mode id: " << mMode << endl;
+        s << "rakufaki image size: " << mRakugakis.size() << endl;
         for (int i = 0; i < bFunc.size(); i++) s << "func " << i << ": " << bFunc[i] << endl;
         ofDrawBitmapString(s.str(), 10, 35);
         gui.draw();
@@ -190,10 +194,19 @@ void testApp::drawRain()
 {
     vector<psCircle>::iterator it = mPsCircles.begin();
     while (it != mPsCircles.end()) {
+        //draw rakugaki
+        if (mRakugakis.size()) {
+            float size = (it->circle.getRadius() * 3);
+            float x = it->circle.getPosition().x - (size/2);
+            float y = it->circle.getPosition().y - (size/2);
+            mRakugakis[it->ID].draw(x, y, size, size);
+        }
         if (bDebugView) {
+            ofNoFill();
             ofSetColor(255, 255, 255);
             (*it).circle.draw();
         }
+        
         //delete
         if ((*it).circle.getPosition().y - (*it).circle.getRadius() > ofGetHeight()) {
             it = mPsCircles.erase(it);
@@ -207,16 +220,25 @@ void testApp::drawSnow()
 {
     vector<psCircle>::iterator it = mPsCircles.begin();
     while (it != mPsCircles.end()) {
+        //draw rakugaki
+        if (mRakugakis.size()) {
+            float size = (it->circle.getRadius() * 3);
+            float x = it->circle.getPosition().x - (size/2);
+            float y = it->circle.getPosition().y - (size/2);
+            mRakugakis[it->ID].draw(x, y, size, size);
+        }
         if (bDebugView) {
+            ofNoFill();
             ofSetColor(255, 255, 255, (*it).life);
             (*it).circle.draw();
         }
+        
+        //delete
         if ((*it).circle.getPosition().y + (*it).circle.getRadius() >= ofGetHeight()-10) (*it).touch = true;
         if ((*it).touch) {
             (*it).circle.setRadius((*it).circle.getRadius() - 0.1);
             it->life -= 1;
         }
-        //delete
         if ((*it).circle.getRadius() <= 0) {
             it = mPsCircles.erase(it);
         } else {
@@ -229,12 +251,20 @@ void testApp::drawJump()
 {
     vector<psCircle>::iterator it = mPsCircles.begin();
     while (it != mPsCircles.end()) {
+        //draw rakugaki
+        if (mRakugakis.size()) {
+            float size = (it->circle.getRadius() * 3);
+            float x = it->circle.getPosition().x - (size/2);
+            float y = it->circle.getPosition().y - (size/2);
+            mRakugakis[it->ID].draw(x, y, size, size);
+        }
         if (bDebugView) {
+            ofNoFill();
             ofSetColor(255, 255, 255);
             (*it).circle.draw();
         }
         //delete
-        if ((*it).circle.getRadius() <= 0) {
+        if ((*it).circle.getPosition().y > ofGetHeight() + (*it).circle.getRadius()) {
             it = mPsCircles.erase(it);
         } else {
             it++;
@@ -262,6 +292,10 @@ void testApp::keyPressed(int key){
             
         case ' ':
             bDebugView = !bDebugView;
+            break;
+            
+        case 'r':
+            getAndSetRakugaki("rakugaki_test");
             break;
             
         //1~9,0
@@ -352,6 +386,25 @@ void testApp::dragEvent(ofDragInfo dragInfo){
 }
 
 //--------------------------------------------------------------
+void testApp::getAndSetRakugaki(const string &path)
+{
+    if (mDir.listDir(path) != 0) {
+        mRakugakis.clear();
+        for (int i = 0; i < mDir.size(); i++) {
+            ofImage tImg;
+            if (tImg.loadImage(mDir.getPath(i))) {
+                mRakugakis.push_back(tImg);
+                cout << "load rakugaki : " << mDir.getName(i) << endl;
+            } else {
+                cout << "faild load rakugaki : " << mDir.getName(i) << endl;
+            }
+        }
+        cout << "set rakugaki images " << mRakugakis.size() << endl;
+    } else {
+        cout << "faild load rakufaki images" << endl;
+    }
+}
+
 string testApp::getGuiFileName()
 {
     return "gui_settings_" + ofToString(mMode) + ".xml";

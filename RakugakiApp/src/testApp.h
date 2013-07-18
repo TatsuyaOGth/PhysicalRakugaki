@@ -59,6 +59,7 @@ public:
     
 private:
     
+    void getAndSetRakugaki(const string& path);
     string getGuiFileName();
     
     ofxBox2d mBox2d;
@@ -77,6 +78,7 @@ private:
     
     //image
     vector<ofImage> mRakugakis;
+    ofDirectory mDir;
     
     //view mode
     bool bDebugView;
