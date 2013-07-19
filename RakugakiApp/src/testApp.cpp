@@ -7,7 +7,13 @@ void testApp::setup(){
     ofSetVerticalSync(true);
     ofSetLogLevel(OF_LOG_NOTICE);
     ofBackground(24, 80, 65);
+    ofSetLogLevel(OF_LOG_VERBOSE);
 //    ofSetWindowShape(1024, 768);
+    
+    if (xml.loadFile("def_settings.xml")) {
+        mKinectAngle = xml.getValue("kinect_angle", 0);
+        mClipDepth = 0;
+    }
     
     //----------
     // GUI setup
@@ -29,6 +35,16 @@ void testApp::setup(){
 	mBox2d.setFPS(30.0);
     //mBox2d.createBounds();
     //mBox2d.registerGrabbing();
+    
+    //----------
+    // Kinect setup
+    //----------
+#ifdef ENABLE_KINECT
+	kinect.setRegistration(true);
+	kinect.init(false, false);
+    kinect.open();
+    kinect.setCameraTiltAngle(mKinectAngle);
+#endif
     
     getAndSetRakugaki("rakugaki_test");
     
@@ -63,6 +79,7 @@ void testApp::update(){
     }
     mBox2d.update();
     gui.update();
+    kinect.update();
 }
 
 //--------------------------------------------------------------
@@ -92,6 +109,8 @@ void testApp::draw(){
     //----------
     // debug text
     //----------
+    mDepthImage.draw(0, 0);
+
     if (bDebugView) {
         ofSetColor(255);
         stringstream s;
@@ -100,10 +119,25 @@ void testApp::draw(){
         s << "physic circles: " << mPsCircles.size() << endl;
         s << "mode id: " << mMode << endl;
         s << "rakufaki image size: " << mRakugakis.size() << endl;
+        s << "kinect angle: " << mKinectAngle << endl;
+        s << "kinect cont pts " << mContPts.size() << endl;
+        s << "clip depth: " << mClipDepth << endl;
         for (int i = 0; i < bFunc.size(); i++) s << "func " << i << ": " << bFunc[i] << endl;
         ofDrawBitmapString(s.str(), 10, 35);
         gui.draw();
     }
+    getKinectContoursPts();
+    ofPoint tPos;
+    for (int i = 0; i < mContPts.size(); i++) {
+        ofLine(tPos, mContPts[i]);
+        tPos = mContPts[i];
+    }
+}
+
+//--------------------------------------------------------------
+void testApp::exit(){
+    kinect.setCameraTiltAngle(0);
+    xml.saveFile();
 }
 
 //============================================================== setup
@@ -113,7 +147,7 @@ void testApp::setupRain()
     mPsCircles.clear();
     mBox2d.init();
     mBox2d.setGravity(0, 10);
-    //	mBox2d.createGround();
+//	mBox2d.createGround();
 	mBox2d.setFPS(24.0);
     gui.loadSettings(getGuiFileName());
 }
@@ -191,7 +225,7 @@ void testApp::drawTitle()
 }
 
 void testApp::drawRain()
-{
+{    
     vector<psCircle>::iterator it = mPsCircles.begin();
     while (it != mPsCircles.end()) {
         //draw rakugaki
@@ -276,12 +310,28 @@ void testApp::drawJump()
 void testApp::keyPressed(int key){
     switch (key) {
         case OF_KEY_LEFT:
+            mClipDepth--;
+            if (mClipDepth < 0) mClipDepth = 0;
             break;
         case OF_KEY_RIGHT:
+            mClipDepth++;
+            if (mClipDepth > 255) mClipDepth = 255;
             break;
         case OF_KEY_UP:
+#ifdef ENABLE_KINECT
+            mKinectAngle++;
+            if (mKinectAngle > 30) mKinectAngle = 30;
+            kinect.setCameraTiltAngle(mKinectAngle);
+            xml.setValue("kinect_angle", mKinectAngle);
+#endif
             break;
         case OF_KEY_DOWN:
+#ifdef ENABLE_KINECT
+            mKinectAngle--;
+            if (mKinectAngle < -30) mKinectAngle = -30;
+            kinect.setCameraTiltAngle(mKinectAngle);
+            xml.setValue("kinect_angle", mKinectAngle);
+#endif
             break;
         case OF_KEY_BACKSPACE:
         case OF_KEY_DEL:
@@ -408,4 +458,27 @@ void testApp::getAndSetRakugaki(const string &path)
 string testApp::getGuiFileName()
 {
     return "gui_settings_" + ofToString(mMode) + ".xml";
+}
+
+void testApp::getKinectContoursPts()
+{
+#ifdef ENABLE_KINECT
+    if (kinect.isFrameNew()) {
+        int size = kinect.width * kinect.height;
+//        kinect.setDepthClipping(0, 2000);
+        mDepthImage.setFromPixels(kinect.getDepthPixels(), kinect.width, kinect.height, OF_IMAGE_GRAYSCALE);
+        unsigned char* px = new unsigned char[size];
+        for (int i = 0; i < size; i++) {
+            if (mDepthImage.getPixels()[i] < mClipDepth) {
+                px[i] = 0;
+            } else {
+                px[i] = mDepthImage.getPixels()[i];
+            }
+        }
+        mDepthImage.setFromPixels(px, kinect.width, kinect.height, OF_IMAGE_GRAYSCALE);
+        mContPts = og.getContourPoints(mDepthImage, 10);
+        delete px;
+    }
+#endif
+    return ;
 }

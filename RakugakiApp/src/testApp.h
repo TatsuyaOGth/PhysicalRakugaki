@@ -6,6 +6,9 @@
 #include "ofxTrueTypeFontUC.h"
 #include "ofxXmlSettings.h"
 #include "ofxControlPanel.h"
+#include "ofxKinect.h"
+
+#define ENABLE_KINECT
 
 //Control Panel Propaty
 //各コントローラは各モード毎の設定を与える型として使用
@@ -29,6 +32,7 @@ public:
     void setup();
     void update();
     void draw();
+    void exit();
     
     void keyPressed  (int key);
     void keyReleased(int key);
@@ -61,9 +65,16 @@ private:
     
     void getAndSetRakugaki(const string& path);
     string getGuiFileName();
+    void getKinectContoursPts();
     
     ofxBox2d mBox2d;
     ofxControlPanel gui;
+    ofxXmlSettings xml;
+    ofxKinect kinect;
+    ofxOgsn og;
+    
+    int mKinectAngle;
+    int mClipDepth;
     
     typedef struct _psCircle {
         unsigned int ID = 0;
@@ -73,6 +84,8 @@ private:
     } psCircle;
     vector<psCircle> mPsCircles;
     
+    ofImage mDepthImage;
+    vector<ofPoint> mContPts;
     vector<ofPolyline> mPLines;
 	vector<ofxBox2dPolygon>	mPPolyLines;
     
