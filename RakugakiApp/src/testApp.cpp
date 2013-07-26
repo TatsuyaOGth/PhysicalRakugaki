@@ -44,6 +44,7 @@ void testApp::setup(){
 	kinect.init(false, false);
     kinect.open();
     kinect.setCameraTiltAngle(mKinectAngle);
+    mDepthImage.allocate(kinect.width, kinect.height);
 #endif
     
     getAndSetRakugaki("rakugaki_test");
@@ -79,7 +80,9 @@ void testApp::update(){
     }
     mBox2d.update();
     gui.update();
+#ifdef ENABLE_KINECT
     kinect.update();
+#endif
 }
 
 //--------------------------------------------------------------
@@ -109,8 +112,6 @@ void testApp::draw(){
     //----------
     // debug text
     //----------
-    mDepthImage.draw(0, 0);
-
     if (bDebugView) {
         ofSetColor(255);
         stringstream s;
@@ -125,18 +126,19 @@ void testApp::draw(){
         for (int i = 0; i < bFunc.size(); i++) s << "func " << i << ": " << bFunc[i] << endl;
         ofDrawBitmapString(s.str(), 10, 35);
         gui.draw();
+        
+        //kinect image
+        mDepthImage.draw(0, 0);
+        mContour.draw();
     }
     getKinectContoursPts();
-    ofPoint tPos;
-    for (int i = 0; i < mContPts.size(); i++) {
-        ofLine(tPos, mContPts[i]);
-        tPos = mContPts[i];
-    }
 }
 
 //--------------------------------------------------------------
 void testApp::exit(){
+#ifdef ENABLE_KINECT
     kinect.setCameraTiltAngle(0);
+#endif
     xml.saveFile();
 }
 
@@ -466,7 +468,7 @@ void testApp::getKinectContoursPts()
     if (kinect.isFrameNew()) {
         int size = kinect.width * kinect.height;
 //        kinect.setDepthClipping(0, 2000);
-        mDepthImage.setFromPixels(kinect.getDepthPixels(), kinect.width, kinect.height, OF_IMAGE_GRAYSCALE);
+        mDepthImage.setFromPixels(kinect.getDepthPixels(), kinect.width, kinect.height);
         unsigned char* px = new unsigned char[size];
         for (int i = 0; i < size; i++) {
             if (mDepthImage.getPixels()[i] < mClipDepth) {
@@ -475,8 +477,10 @@ void testApp::getKinectContoursPts()
                 px[i] = mDepthImage.getPixels()[i];
             }
         }
-        mDepthImage.setFromPixels(px, kinect.width, kinect.height, OF_IMAGE_GRAYSCALE);
-        mContPts = og.getContourPoints(mDepthImage, 10);
+        mDepthImage.setFromPixels(px, kinect.width, kinect.height);
+//        mContPts = og.getContourPoints(mDepthImage, 10);
+        mContour.findContours(mDepthImage, 10, mDepthImage.width * mDepthImage.height, 20, false);
+        
         delete px;
     }
 #endif
