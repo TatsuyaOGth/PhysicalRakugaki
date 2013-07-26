@@ -87,7 +87,6 @@ private:
     
     ofxCvGrayscaleImage mDepthImage;
     ofxCvContourFinder mContour;
-    vector<ofPoint> mContPts;
     vector<ofPolyline> mPLines;
 	vector<ofxBox2dPolygon>	mPPolyLines;
     

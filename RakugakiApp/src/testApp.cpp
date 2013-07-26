@@ -120,8 +120,8 @@ void testApp::draw(){
         s << "physic circles: " << mPsCircles.size() << endl;
         s << "mode id: " << mMode << endl;
         s << "rakufaki image size: " << mRakugakis.size() << endl;
+        s << "finded contours: " << mContour.nBlobs << endl;
         s << "kinect angle: " << mKinectAngle << endl;
-        s << "kinect cont pts " << mContPts.size() << endl;
         s << "clip depth: " << mClipDepth << endl;
         for (int i = 0; i < bFunc.size(); i++) s << "func " << i << ": " << bFunc[i] << endl;
         ofDrawBitmapString(s.str(), 10, 35);
@@ -467,7 +467,6 @@ void testApp::getKinectContoursPts()
 #ifdef ENABLE_KINECT
     if (kinect.isFrameNew()) {
         int size = kinect.width * kinect.height;
-//        kinect.setDepthClipping(0, 2000);
         mDepthImage.setFromPixels(kinect.getDepthPixels(), kinect.width, kinect.height);
         unsigned char* px = new unsigned char[size];
         for (int i = 0; i < size; i++) {
@@ -478,9 +477,7 @@ void testApp::getKinectContoursPts()
             }
         }
         mDepthImage.setFromPixels(px, kinect.width, kinect.height);
-//        mContPts = og.getContourPoints(mDepthImage, 10);
-        mContour.findContours(mDepthImage, 10, mDepthImage.width * mDepthImage.height, 20, false);
-        
+        mContour.findContours(mDepthImage, 10, mDepthImage.width * mDepthImage.height, 20, false);        
         delete px;
     }
 #endif
