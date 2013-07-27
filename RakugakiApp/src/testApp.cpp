@@ -4,10 +4,11 @@
 //--------------------------------------------------------------
 void testApp::setup(){
     ofEnableAlphaBlending();
+    ofSetFrameRate(60);
     ofSetVerticalSync(true);
+    ofSetCircleResolution(80);
     ofSetLogLevel(OF_LOG_NOTICE);
     ofBackground(255);
-    ofSetLogLevel(OF_LOG_VERBOSE);
 //    ofSetWindowShape(1024, 768);
     
     if (xml.loadFile("def_settings.xml")) {
@@ -147,13 +148,24 @@ void testApp::draw(){
         s << "finded contours: " << mContour.nBlobs << endl;
         s << "kinect angle: " << mKinectAngle << endl;
         s << "clip depth: " << mClipDepth << endl;
+        s << "target id: " << mTargetID << endl;
         for (int i = 0; i < bFunc.size(); i++) s << "func " << i << ": " << bFunc[i] << endl;
         ofDrawBitmapString(s.str(), 10, 35);
         gui.draw();
         
         //kinect image
-        mDepthImage.draw(0, 0);
+//        mDepthImage.draw(0, 0);
         mContour.draw();
+//        for (int i = 0; i < mKinectPsCircles.size(); i++) {
+//            ofFill();
+//            ofSetColor(0, 0, 255);
+//            mKinectPsCircles[i].draw();
+//        }
+        for (int i = 0; i < mKinectPsRect.size(); i++) {
+            ofFill();
+            ofSetColor(0, 0, 255, 80);
+            mKinectPsRect[i].draw();
+        }
     }
     getKinectContoursPts();
 }
@@ -259,7 +271,8 @@ void testApp::updateJump()
 void testApp::updatePachinco()
 {
     if (bFunc[0]) {
-        if((int)ofRandom(0, 3) == 0) {
+        int p = (int)(gui.getValueF(GUI_SLIDER_01) * 30) + 3;
+        if((int)ofRandom(0, p) == 0) {
             psCircle c;
             c.ID = (int)ofRandom(mRakugakis.size());
             c.circle.setPhysics(1, 0.2, 0.8);
@@ -404,6 +417,17 @@ void testApp::drawPachinco()
             it++;
         }
     }
+    // draw target image
+    if (mRakugakis.size()) {
+        float x = ofGetWidth() - 60;
+        float y = 60;
+        float r = 55;
+        ofSetColor(80, 127);
+        ofFill();
+        ofCircle(x, y, r);
+        ofSetColor(255);
+        mRakugakis[mTargetID].draw(x-r, y-r, r*2, r*2);
+    }
 }
 
 //--------------------------------------------------------------
@@ -453,6 +477,14 @@ void testApp::keyPressed(int key){
             break;
             
         case 'z':
+            if (mRakugakis.size())
+                mTargetID = (mTargetID - 1) % mRakugakis.size();
+            break;
+            
+        case 'x':
+            if (mRakugakis.size())
+                mTargetID = (mTargetID + 1) % mRakugakis.size();
+            break;
             
         //1~9,0
         case '1': mMode = TEST_MODE; break;
@@ -514,7 +546,7 @@ void testApp::mousePressed(int x, int y, int button){
 void testApp::mouseReleased(int x, int y, int button){
     if (bDebugView) {
         gui.mouseReleased();
-        gui.saveSettings(); //audo save
+        gui.saveSettings();
     } else {
         
         ofxBox2dPolygon poly;
@@ -609,8 +641,40 @@ void testApp::getKinectContoursPts()
             }
         }
         mDepthImage.setFromPixels(px, kinect.width, kinect.height);
-        mContour.findContours(mDepthImage, 10, mDepthImage.width * mDepthImage.height, 20, false);        
         delete px;
+
+        mContour.findContours(mDepthImage, 10, mDepthImage.width * mDepthImage.height, 20, false);
+//        mPKinectPolyLines.clear();
+//        for (int i = 0; i < mContour.blobs.size(); i++) {
+//            ofPolyline poly;
+//            for (int j = 0; j < mContour.blobs[i].pts.size(); j++) {
+//                poly.addVertex(mContour.blobs[i].pts[j]);
+//            }
+//            ofxBox2dPolygon psPoly;
+//            poly.simplify();
+//            for (int k = 0; k < poly.size(); k++) {
+//                psPoly.addVertex(poly[k]);
+//            }
+//            psPoly.create(mBox2d.getWorld());
+//            mPKinectPolyLines.push_back(psPoly);
+//        }
+        
+        mKinectPsRect.clear();
+        for (int i = 0; i < mContour.blobs.size(); i++) {
+//            ofxBox2dCircle c;
+//            c.setup(mBox2d.getWorld(),
+//                    mContour.blobs[i].centroid.x,
+//                    mContour.blobs[i].centroid.y,
+//                    min(mContour.blobs[i].boundingRect.width/2, mContour.blobs[i].boundingRect.height/2));
+//            mKinectPsCircles.push_back(c);
+//            ofxBox2dRect r;
+//            r.setup(mBox2d.getWorld(),
+//                    mContour.blobs[i].boundingRect.x + (mContour.blobs[i].boundingRect.width/2),
+//                    mContour.blobs[i].boundingRect.y + (mContour.blobs[i].boundingRect.height/2),
+//                    mContour.blobs[i].boundingRect.width/2,
+//                    mContour.blobs[i].boundingRect.height/2);
+//            mKinectPsRect.push_back(r);
+        }
     }
 #endif
     return ;

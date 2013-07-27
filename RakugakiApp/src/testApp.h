@@ -8,6 +8,7 @@
 #include "ofxXmlSettings.h"
 #include "ofxControlPanel.h"
 #include "ofxKinect.h"
+#include "ofxOsc.h"
 
 //#define ENABLE_KINECT
 
@@ -94,6 +95,10 @@ private:
     ofxCvContourFinder mContour;
     vector<ofPolyline> mPLines;
 	vector<ofxBox2dPolygon>	mPPolyLines;
+//	vector<ofxBox2dPolygon>	mPKinectPolyLines;
+    vector<ofxBox2dCircle> mKinectPsCircles;
+    vector<ofxBox2dRect> mKinectPsRect;
+    
     
     //image
     vector<ofImage> mRakugakis;
