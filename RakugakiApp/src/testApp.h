@@ -2,6 +2,7 @@
 
 #include "ofMain.h"
 #include "ofxOgsn.h"
+#include "ofxOpenCv.h"
 #include "ofxBox2d.h"
 #include "ofxTrueTypeFontUC.h"
 #include "ofxXmlSettings.h"
@@ -89,8 +90,8 @@ private:
     } psCircle;
     vector<psCircle> mPsCircles;
     
-    ofImage mDepthImage;
-    vector<ofPoint> mContPts;
+    ofxCvGrayscaleImage mDepthImage;
+    ofxCvContourFinder mContour;
     vector<ofPolyline> mPLines;
 	vector<ofxBox2dPolygon>	mPPolyLines;
     
