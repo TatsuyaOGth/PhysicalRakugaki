@@ -48,6 +48,9 @@ void testApp::setup(){
     mDepthImage.allocate(kinect.width, kinect.height);
 #endif
     
+    //OSC
+    receiver.setup(42414);
+    
     getAndSetRakugaki("rakugaki_test");
     
     bDebugView = true;
@@ -85,6 +88,10 @@ void testApp::update(){
         case PACHINCO:
             updatePachinco();
             break;
+            
+        case DOREMI:
+            updateDoremi();
+            break;
     }
     mBox2d.update();
     gui.update();
@@ -119,6 +126,10 @@ void testApp::draw(){
             
         case PACHINCO:
             drawPachinco();
+            break;
+            
+        case DOREMI:
+            drawDoremi();
             break;
     }
     
@@ -224,6 +235,17 @@ void testApp::setupPachinco()
     clearPolyLines();
 }
 
+void testApp::setupDoremi()
+{
+    mPsCircles.clear();
+    mBox2d.init();
+    mBox2d.setGravity(0, 1);
+//    mBox2d.createGround();
+	mBox2d.setFPS(24.0);
+    gui.loadSettings(getGuiFileName());
+    clearPolyLines();
+}
+
 //============================================================== update
 
 void testApp::updateTitle()
@@ -278,6 +300,24 @@ void testApp::updatePachinco()
             c.circle.setPhysics(1, 0.2, 0.8);
             c.circle.setup(mBox2d.getWorld(), ofRandom(ofGetWidth()), -100, 20);
             c.circle.setVelocity(ofRandom(-1, 1), 0);
+            mPsCircles.push_back(c);
+        }
+    }
+}
+
+void testApp::updateDoremi()
+{
+    while (receiver.hasWaitingMessages()) {
+        ofxOscMessage m;
+        receiver.getNextMessage(&m);
+        if (m.getAddress() == "/play") {
+            int jumpV = (int)(gui.getValueF(GUI_SLIDER_01) * 15);
+            float xV = gui.getValueF(GUI_SLIDER_02) * 5;
+            psCircle c;
+            c.ID = m.getArgAsInt32(0);
+            c.circle.setPhysics(1, 0.8, 0.2);
+            c.circle.setup(mBox2d.getWorld(), ofRandom(ofGetWidth()), ofGetHeight(), m.getArgAsInt32(1) * 5);
+            c.circle.setVelocity(ofRandom(-xV, xV), -(jumpV * m.getArgAsFloat(2)));
             mPsCircles.push_back(c);
         }
     }
@@ -430,6 +470,37 @@ void testApp::drawPachinco()
     }
 }
 
+void testApp::drawDoremi()
+{
+    vector<psCircle>::iterator it = mPsCircles.begin();
+    while (it != mPsCircles.end()) {
+        //draw rakugaki
+        if (mRakugakis.size()) {
+            ofPushMatrix();
+            float w = mRakugakis[it->ID].width * gui.getValueF(GUI_SLIDER_03);
+            float h = mRakugakis[it->ID].height * gui.getValueF(GUI_SLIDER_03);
+            float x = it->circle.getPosition().x - (w/2);
+            float y = it->circle.getPosition().y - (h/2);
+            ofTranslate(x + (w/2), y + (h/2));
+            ofRotate(it->circle.getRotation());
+            ofSetColor(255, it->life);
+            mRakugakis[it->ID].draw(-(w/2), -(h/2), w, h);
+            ofPopMatrix();
+        }
+        if (bDebugView) {
+            ofNoFill();
+            ofSetColor(0, 255, 0);
+            (*it).circle.draw();
+        }
+        //delete
+        if ((*it).circle.getPosition().y > ofGetHeight() + (*it).circle.getRadius()) {
+            it = mPsCircles.erase(it);
+        } else {
+            it++;
+        }
+    }
+}
+
 //--------------------------------------------------------------
 void testApp::keyPressed(int key){
     switch (key) {
@@ -493,7 +564,7 @@ void testApp::keyPressed(int key){
         case '4': mMode = SNOW_FALL; setupSnow(); break;
         case '5': mMode = JUMP; setupJump(); break;
         case '6': mMode = PACHINCO; setupPachinco(); break;
-        case '7':  break;
+        case '7': mMode = DOREMI; setupDoremi(); break;
         case '8':  break;
         case '9':  break;
         case '0':  break;
@@ -586,6 +657,10 @@ void testApp::windowResized(int w, int h){
             
         case PACHINCO:
             setupPachinco();
+            break;
+            
+        case DOREMI:
+            setupDoremi();
             break;
     }
 }

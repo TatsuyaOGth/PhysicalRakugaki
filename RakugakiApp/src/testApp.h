@@ -27,7 +27,8 @@ enum mode {
     RAIN_DROP,
     SNOW_FALL,
     JUMP,
-    PACHINCO
+    PACHINCO,
+    DOREMI
 };
 
 class testApp : public ofBaseApp{
@@ -52,6 +53,7 @@ public:
     void setupSnow();
     void setupJump();
     void setupPachinco();
+    void setupDoremi();
     
     //=== Each Update ===
     void updateTitle();
@@ -59,6 +61,7 @@ public:
     void updateSnow();
     void updateJump();
     void updatePachinco();
+    void updateDoremi();
     
     //=== Each Draw ===
     void drawTitle();
@@ -66,6 +69,7 @@ public:
     void drawSnow();
     void drawJump();
     void drawPachinco();
+    void drawDoremi();
     
 private:
     
@@ -114,5 +118,8 @@ private:
     
     //target mode
     int mTargetID;
+    
+    //OSC
+    ofxOscReceiver receiver;
 
 };
