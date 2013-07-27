@@ -6,7 +6,7 @@ void testApp::setup(){
     ofEnableAlphaBlending();
     ofSetVerticalSync(true);
     ofSetLogLevel(OF_LOG_NOTICE);
-    ofBackground(24, 80, 65);
+    ofBackground(255);
     ofSetLogLevel(OF_LOG_VERBOSE);
 //    ofSetWindowShape(1024, 768);
     
@@ -51,9 +51,12 @@ void testApp::setup(){
     bDebugView = true;
     mMode = TEST_MODE;
     for (int i = 0; i < 9; i++) bFunc[i] = 0;
+    bFunc[0] = true;
     
     // TITLE
     mFont.loadFont("ComicSansMS.ttf", 80);
+    
+    mTargetID = 0;
 }
 
 //--------------------------------------------------------------
@@ -76,6 +79,10 @@ void testApp::update(){
         case JUMP:
             updateJump();
             break;
+        
+        case PACHINCO:
+            updatePachinco();
+            break;
     }
     mBox2d.update();
     gui.update();
@@ -84,7 +91,8 @@ void testApp::update(){
 
 //--------------------------------------------------------------
 void testApp::draw(){
-    
+    ofSetColor(255);
+
     switch (mMode) {
         case TEST_MODE:
             break;
@@ -104,7 +112,23 @@ void testApp::draw(){
         case JUMP:
             drawJump();
             break;
+            
+        case PACHINCO:
+            drawPachinco();
+            break;
     }
+    
+    //----------
+    // draw lines
+    //----------
+    ofSetColor(0);
+	ofNoFill();
+	for (int i=0; i<mPLines.size(); i++) {
+		mPLines[i].draw();
+	}
+	for (int i=0; i<mPPolyLines.size(); i++) {
+		mPPolyLines[i].draw();
+	}
     
     //----------
     // debug text
@@ -112,7 +136,7 @@ void testApp::draw(){
     mDepthImage.draw(0, 0);
 
     if (bDebugView) {
-        ofSetColor(255);
+        ofSetColor(0);
         stringstream s;
         s << "fps: " << ofToString(ofGetFrameRate(), 2) << endl;
         s << "window size: " << ofGetWidth() << " " << ofGetHeight() << endl;
@@ -150,6 +174,7 @@ void testApp::setupRain()
 //	mBox2d.createGround();
 	mBox2d.setFPS(24.0);
     gui.loadSettings(getGuiFileName());
+    clearPolyLines();
 }
 
 void testApp::setupSnow()
@@ -160,6 +185,7 @@ void testApp::setupSnow()
     mBox2d.createGround();
 	mBox2d.setFPS(24.0);
     gui.loadSettings(getGuiFileName());
+    clearPolyLines();
 }
 
 void testApp::setupJump()
@@ -170,6 +196,18 @@ void testApp::setupJump()
 //    mBox2d.createGround();
 	mBox2d.setFPS(24.0);
     gui.loadSettings(getGuiFileName());
+    clearPolyLines();
+}
+
+void testApp::setupPachinco()
+{
+    mPsCircles.clear();
+    mBox2d.init();
+    mBox2d.setGravity(0, 1);
+    mBox2d.createGround();
+	mBox2d.setFPS(24.0);
+    gui.loadSettings(getGuiFileName());
+    clearPolyLines();
 }
 
 //============================================================== update
@@ -216,6 +254,20 @@ void testApp::updateJump()
 	}
 }
 
+void testApp::updatePachinco()
+{
+    if (bFunc[0]) {
+        if((int)ofRandom(0, 3) == 0) {
+            psCircle c;
+            c.ID = (int)ofRandom(mRakugakis.size());
+            c.circle.setPhysics(1, 0.2, 0.8);
+            c.circle.setup(mBox2d.getWorld(), ofRandom(ofGetWidth()), -100, 20);
+            c.circle.setVelocity(ofRandom(-1, 1), 0);
+            mPsCircles.push_back(c);
+        }
+    }
+}
+
 //============================================================== draw
 
 void testApp::drawTitle()
@@ -230,14 +282,16 @@ void testApp::drawRain()
     while (it != mPsCircles.end()) {
         //draw rakugaki
         if (mRakugakis.size()) {
-            float size = (it->circle.getRadius() * 3);
-            float x = it->circle.getPosition().x - (size/2);
-            float y = it->circle.getPosition().y - (size/2);
-            mRakugakis[it->ID].draw(x, y, size, size);
+            float w = mRakugakis[it->ID].width * gui.getValueF(GUI_SLIDER_03);
+            float h = mRakugakis[it->ID].height * gui.getValueF(GUI_SLIDER_03);
+            float x = it->circle.getPosition().x - (w/2);
+            float y = it->circle.getPosition().y - (h/2);
+            ofSetColor(255);
+            mRakugakis[it->ID].draw(x, y, w, h);
         }
         if (bDebugView) {
             ofNoFill();
-            ofSetColor(255, 255, 255);
+            ofSetColor(0, 255, 0);
             (*it).circle.draw();
         }
         
@@ -256,14 +310,16 @@ void testApp::drawSnow()
     while (it != mPsCircles.end()) {
         //draw rakugaki
         if (mRakugakis.size()) {
-            float size = (it->circle.getRadius() * 3);
-            float x = it->circle.getPosition().x - (size/2);
-            float y = it->circle.getPosition().y - (size/2);
-            mRakugakis[it->ID].draw(x, y, size, size);
+            float w = (mRakugakis[it->ID].width * gui.getValueF(GUI_SLIDER_03)) * ((float)it->life/255);
+            float h = (mRakugakis[it->ID].height * gui.getValueF(GUI_SLIDER_03)) * ((float)it->life/255);
+            float x = it->circle.getPosition().x - (w/2);
+            float y = it->circle.getPosition().y - (h/2);
+            ofSetColor(255, it->life);
+            mRakugakis[it->ID].draw(x, y, w, h);
         }
         if (bDebugView) {
             ofNoFill();
-            ofSetColor(255, 255, 255, (*it).life);
+            ofSetColor(0, 255, 0, (*it).life);
             (*it).circle.draw();
         }
         
@@ -287,18 +343,60 @@ void testApp::drawJump()
     while (it != mPsCircles.end()) {
         //draw rakugaki
         if (mRakugakis.size()) {
-            float size = (it->circle.getRadius() * 3);
-            float x = it->circle.getPosition().x - (size/2);
-            float y = it->circle.getPosition().y - (size/2);
-            mRakugakis[it->ID].draw(x, y, size, size);
+            ofPushMatrix();
+            float w = mRakugakis[it->ID].width * gui.getValueF(GUI_SLIDER_03);
+            float h = mRakugakis[it->ID].height * gui.getValueF(GUI_SLIDER_03);
+            float x = it->circle.getPosition().x - (w/2);
+            float y = it->circle.getPosition().y - (h/2);
+            ofTranslate(x + (w/2), y + (h/2));
+            ofRotate(it->circle.getRotation());
+            ofSetColor(255);
+            mRakugakis[it->ID].draw(-(w/2), -(h/2), w, h);
+            ofPopMatrix();
         }
         if (bDebugView) {
             ofNoFill();
-            ofSetColor(255, 255, 255);
+            ofSetColor(0, 255, 0);
             (*it).circle.draw();
         }
         //delete
         if ((*it).circle.getPosition().y > ofGetHeight() + (*it).circle.getRadius()) {
+            it = mPsCircles.erase(it);
+        } else {
+            it++;
+        }
+    }
+}
+
+void testApp::drawPachinco()
+{
+    vector<psCircle>::iterator it = mPsCircles.begin();
+    while (it != mPsCircles.end()) {
+        //draw rakugaki
+        if (mRakugakis.size()) {
+            ofPushMatrix();
+            float w = (mRakugakis[it->ID].width * gui.getValueF(GUI_SLIDER_03)) * ((float)it->life/255);
+            float h = (mRakugakis[it->ID].height * gui.getValueF(GUI_SLIDER_03)) * ((float)it->life/255);
+            float x = it->circle.getPosition().x - (w/2);
+            float y = it->circle.getPosition().y - (h/2);
+            ofTranslate(x + (w/2), y + (h/2));
+            ofRotate(it->circle.getRotation());
+            ofSetColor(255, it->life);
+            mRakugakis[it->ID].draw(-(w/2), -(h/2), w, h);
+            ofPopMatrix();
+        }
+        if (bDebugView) {
+            ofNoFill();
+            ofSetColor(0, 255, 0);
+            (*it).circle.draw();
+        }
+        //delete
+        if ((*it).circle.getPosition().y + (*it).circle.getRadius() >= ofGetHeight()-10) (*it).touch = true;
+        if ((*it).touch) {
+            (*it).circle.setRadius((*it).circle.getRadius() - 0.1);
+            it->life -= 3;
+        }
+        if ((*it).circle.getRadius() <= 0) {
             it = mPsCircles.erase(it);
         } else {
             it++;
@@ -348,13 +446,19 @@ void testApp::keyPressed(int key){
             getAndSetRakugaki("rakugaki_test");
             break;
             
+        case 'c':
+            clearPolyLines();
+            break;
+            
+        case 'z':
+            
         //1~9,0
         case '1': mMode = TEST_MODE; break;
         case '2': mMode = TITLE; break;
         case '3': mMode = RAIN_DROP; setupRain(); break;
         case '4': mMode = SNOW_FALL; setupSnow(); break;
         case '5': mMode = JUMP; setupJump(); break;
-        case '6':  break;
+        case '6': mMode = PACHINCO; setupPachinco(); break;
         case '7':  break;
         case '8':  break;
         case '9':  break;
@@ -387,18 +491,41 @@ void testApp::mouseMoved(int x, int y ){
 
 //--------------------------------------------------------------
 void testApp::mouseDragged(int x, int y, int button){
-    gui.mouseDragged(x, y, button);
+    if (bDebugView) {
+        gui.mouseDragged(x, y, button);
+    } else {
+        mPLines.back().addVertex(x, y);
+    }
 }
 
 //--------------------------------------------------------------
 void testApp::mousePressed(int x, int y, int button){
-    gui.mousePressed(x, y, button);
+    if (bDebugView) {
+        gui.mousePressed(x, y, button);
+    } else {
+        mPLines.push_back(ofPolyline());
+        mPLines.back().addVertex(x, y);
+    }
 }
 
 //--------------------------------------------------------------
 void testApp::mouseReleased(int x, int y, int button){
-    gui.mouseReleased();
-    gui.saveSettings(); //audo save
+    if (bDebugView) {
+        gui.mouseReleased();
+        gui.saveSettings(); //audo save
+    } else {
+        
+        ofxBox2dPolygon poly;
+        mPLines.back().simplify();
+        
+        for (int i=0; i<mPLines.back().size(); i++) {
+            poly.addVertex(mPLines.back()[i]);
+        }
+        
+        //poly.setPhysics(1, .2, 1);  // uncomment this to see it fall!
+        poly.create(mBox2d.getWorld());
+        mPPolyLines.push_back(poly);
+    }
 }
 
 //--------------------------------------------------------------
@@ -422,6 +549,10 @@ void testApp::windowResized(int w, int h){
         case JUMP:
             setupJump();
             break;
+            
+        case PACHINCO:
+            setupPachinco();
+            break;
     }
 }
 
@@ -438,6 +569,7 @@ void testApp::dragEvent(ofDragInfo dragInfo){
 //--------------------------------------------------------------
 void testApp::getAndSetRakugaki(const string &path)
 {
+    mPsCircles.clear();
     if (mDir.listDir(path) != 0) {
         mRakugakis.clear();
         for (int i = 0; i < mDir.size(); i++) {
@@ -481,4 +613,12 @@ void testApp::getKinectContoursPts()
     }
 #endif
     return ;
+}
+
+void testApp::clearPolyLines()
+{
+    mPLines.clear();
+    for (int i=0; i<mPPolyLines.size(); i++) {
+        mPPolyLines[i].destroy();
+    }
 }

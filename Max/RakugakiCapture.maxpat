@@ -10,7 +10,7 @@
 ,
 		"rect" : [ 5.0, 44.0, 1275.0, 706.0 ],
 		"bglocked" : 0,
-		"openinpresentation" : 0,
+		"openinpresentation" : 1,
 		"default_fontsize" : 9.0,
 		"default_fontface" : 0,
 		"default_fontname" : "Geneva",
@@ -28,6 +28,21 @@
 		"digest" : "",
 		"tags" : "",
 		"boxes" : [ 			{
+				"box" : 				{
+					"fontname" : "Geneva",
+					"fontsize" : 9.0,
+					"frgb" : 0.0,
+					"id" : "obj-19",
+					"maxclass" : "comment",
+					"numinlets" : 1,
+					"numoutlets" : 0,
+					"patching_rect" : [ 1344.0, 1360.0, 150.0, 18.0 ],
+					"presentation" : 1,
+					"presentation_rect" : [ 40.0, 1720.0, 56.0, 18.0 ]
+				}
+
+			}
+, 			{
 				"box" : 				{
 					"id" : "obj-46",
 					"maxclass" : "button",
@@ -64,6 +79,8 @@
 					"numoutlets" : 1,
 					"outlettype" : [ "jit_matrix" ],
 					"patching_rect" : [ 200.0, 136.0, 180.0, 164.0 ],
+					"presentation" : 1,
+					"presentation_rect" : [ 704.0, 24.0, 180.0, 164.0 ],
 					"prototypename" : "pixl"
 				}
 
@@ -157,13 +174,13 @@
 					"fontname" : "Geneva",
 					"fontsize" : 9.0,
 					"id" : "obj-11",
-					"linecount" : 5,
+					"linecount" : 8,
 					"maxclass" : "message",
 					"numinlets" : 2,
 					"numoutlets" : 1,
 					"outlettype" : [ "" ],
-					"patching_rect" : [ 1056.0, 744.0, 80.0, 61.0 ],
-					"text" : "/Users/tatsuyaogusu/Documents/Wasedanomori_2013/testexport/test.png"
+					"patching_rect" : [ 1056.0, 744.0, 80.0, 94.0 ],
+					"text" : "/Users/tatsuyaogusu/Documents/Programs/openFrameworks/of_v0074/apps/PhysicalRakugaki/RakugakiApp/bin/data/test"
 				}
 
 			}
@@ -229,7 +246,7 @@
 					"numinlets" : 1,
 					"numoutlets" : 1,
 					"outlettype" : [ "bang" ],
-					"patching_rect" : [ 1288.0, 720.0, 50.0, 18.0 ],
+					"patching_rect" : [ 1312.0, 720.0, 50.0, 18.0 ],
 					"text" : "loadbang"
 				}
 
@@ -255,6 +272,7 @@
 					"frgb" : 0.0,
 					"id" : "obj-36",
 					"keymode" : 1,
+					"linecount" : 2,
 					"maxclass" : "textedit",
 					"numinlets" : 1,
 					"numoutlets" : 4,
@@ -262,8 +280,8 @@
 					"parameter_enable" : 0,
 					"patching_rect" : [ 1056.0, 672.0, 483.0, 18.0 ],
 					"presentation" : 1,
-					"presentation_rect" : [ 32.0, 1608.0, 483.0, 18.0 ],
-					"text" : "/Users/tatsuyaogusu/Documents/Wasedanomori_2013/testexport/test.png"
+					"presentation_rect" : [ 32.0, 1608.0, 632.0, 18.0 ],
+					"text" : "/Users/tatsuyaogusu/Documents/Programs/openFrameworks/of_v0074/apps/PhysicalRakugaki/RakugakiApp/bin/data/test"
 				}
 
 			}
@@ -290,8 +308,8 @@
 					"numinlets" : 2,
 					"numoutlets" : 1,
 					"outlettype" : [ "" ],
-					"patching_rect" : [ 1288.0, 744.0, 93.0, 16.0 ],
-					"text" : "read settings, path"
+					"patching_rect" : [ 1312.0, 744.0, 110.0, 16.0 ],
+					"text" : "read settings.dat, path"
 				}
 
 			}
@@ -304,8 +322,8 @@
 					"numinlets" : 2,
 					"numoutlets" : 1,
 					"outlettype" : [ "" ],
-					"patching_rect" : [ 1216.0, 744.0, 70.0, 16.0 ],
-					"text" : "write settings"
+					"patching_rect" : [ 1216.0, 744.0, 88.0, 16.0 ],
+					"text" : "write settings.dat"
 				}
 
 			}
@@ -370,7 +388,7 @@
 							"architecture" : "x86"
 						}
 ,
-						"rect" : [ 0.0, 0.0, 640.0, 480.0 ],
+						"rect" : [ 25.0, 69.0, 640.0, 480.0 ],
 						"bglocked" : 0,
 						"openinpresentation" : 0,
 						"default_fontsize" : 9.0,
@@ -2221,7 +2239,7 @@
 			}
  ],
 		"dependency_cache" : [ 			{
-				"name" : "settings",
+				"name" : "settings.dat",
 				"bootpath" : "/Users/tatsuyaogusu/Documents/Programs/openFrameworks/of_v0074/apps/PhysicalRakugaki/Max",
 				"patcherrelativepath" : "./",
 				"type" : "TEXT",

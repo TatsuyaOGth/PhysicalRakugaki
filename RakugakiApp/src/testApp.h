@@ -8,10 +8,10 @@
 #include "ofxControlPanel.h"
 #include "ofxKinect.h"
 
-#define ENABLE_KINECT
+//#define ENABLE_KINECT
+
 
 //Control Panel Propaty
-//各コントローラは各モード毎の設定を与える型として使用
 static const string GUI_SLIDER_01 = "slider_01";
 static const string GUI_SLIDER_02 = "slider_02";
 static const string GUI_SLIDER_03 = "slider_03";
@@ -24,7 +24,8 @@ enum mode {
     TITLE,
     RAIN_DROP,
     SNOW_FALL,
-    JUMP
+    JUMP,
+    PACHINCO
 };
 
 class testApp : public ofBaseApp{
@@ -48,24 +49,28 @@ public:
     void setupRain();
     void setupSnow();
     void setupJump();
+    void setupPachinco();
     
     //=== Each Update ===
     void updateTitle();
     void updateRain();
     void updateSnow();
     void updateJump();
+    void updatePachinco();
     
     //=== Each Draw ===
     void drawTitle();
     void drawRain();
     void drawSnow();
     void drawJump();
+    void drawPachinco();
     
 private:
     
     void getAndSetRakugaki(const string& path);
     string getGuiFileName();
     void getKinectContoursPts();
+    void clearPolyLines();
     
     ofxBox2d mBox2d;
     ofxControlPanel gui;
@@ -100,5 +105,8 @@ private:
     
     // TITLE
     ofxTrueTypeFontUC mFont;
+    
+    //target mode
+    int mTargetID;
 
 };
