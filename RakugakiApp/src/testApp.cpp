@@ -239,7 +239,7 @@ void testApp::setupDoremi()
 {
     mPsCircles.clear();
     mBox2d.init();
-    mBox2d.setGravity(0, 1);
+    mBox2d.setGravity(0, 4);
 //    mBox2d.createGround();
 	mBox2d.setFPS(24.0);
     gui.loadSettings(getGuiFileName());
@@ -311,12 +311,13 @@ void testApp::updateDoremi()
         ofxOscMessage m;
         receiver.getNextMessage(&m);
         if (m.getAddress() == "/play") {
-            int jumpV = (int)(gui.getValueF(GUI_SLIDER_01) * 15);
+            int jumpV = (int)(gui.getValueF(GUI_SLIDER_01) * 40);
             float xV = gui.getValueF(GUI_SLIDER_02) * 5;
             psCircle c;
             c.ID = m.getArgAsInt32(0);
+            c.size = m.getArgAsFloat(1);
             c.circle.setPhysics(1, 0.8, 0.2);
-            c.circle.setup(mBox2d.getWorld(), ofRandom(ofGetWidth()), ofGetHeight(), m.getArgAsInt32(1) * 5);
+            c.circle.setup(mBox2d.getWorld(), ofRandom(ofGetWidth()), ofGetHeight(), 100 * m.getArgAsFloat(1));
             c.circle.setVelocity(ofRandom(-xV, xV), -(jumpV * m.getArgAsFloat(2)));
             mPsCircles.push_back(c);
         }
@@ -479,6 +480,7 @@ void testApp::drawDoremi()
             ofPushMatrix();
             float w = mRakugakis[it->ID].width * gui.getValueF(GUI_SLIDER_03);
             float h = mRakugakis[it->ID].height * gui.getValueF(GUI_SLIDER_03);
+            w *= it->size; h *= it->size;
             float x = it->circle.getPosition().x - (w/2);
             float y = it->circle.getPosition().y - (h/2);
             ofTranslate(x + (w/2), y + (h/2));

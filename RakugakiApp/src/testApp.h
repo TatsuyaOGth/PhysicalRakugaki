@@ -91,6 +91,7 @@ private:
         unsigned int ID = 0;
         bool touch = false;
         int life = 255;
+        float size = 1;
         ofxBox2dCircle circle;
     } psCircle;
     vector<psCircle> mPsCircles;
