@@ -12,6 +12,12 @@
 
 //#define ENABLE_KINECT
 
+//static const string rakugakiDir = "rakugaki_test";
+//static const string rakugakiDir = "01_01";
+//static const string rakugakiDir = "01_02";
+//static const string rakugakiDir = "01_03";
+
+
 
 //Control Panel Propaty
 static const string GUI_SLIDER_01 = "slider_01";
@@ -108,6 +114,8 @@ private:
     //image
     vector<ofImage> mRakugakis;
     ofDirectory mDir;
+    vector<string> mRakugakiDirs;
+    int mRakugakiDirNum;
     
     //view mode
     bool bDebugView;

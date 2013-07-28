@@ -3,6 +3,14 @@
 
 //--------------------------------------------------------------
 void testApp::setup(){
+//    mRakugakiDirs.push_back("01_01");
+//    mRakugakiDirs.push_back("01_02");
+//    mRakugakiDirs.push_back("01_03");
+    mRakugakiDirs.push_back("02_01");
+    mRakugakiDirs.push_back("02_02");
+    mRakugakiDirs.push_back("02_03");
+    mRakugakiDirNum = 0;
+    
     ofEnableAlphaBlending();
     ofSetFrameRate(60);
     ofSetVerticalSync(true);
@@ -51,7 +59,7 @@ void testApp::setup(){
     //OSC
     receiver.setup(42414);
     
-    getAndSetRakugaki("rakugaki_test");
+    getAndSetRakugaki(mRakugakiDirs[0]);
     
     bDebugView = true;
     mMode = TEST_MODE;
@@ -136,14 +144,17 @@ void testApp::draw(){
     //----------
     // draw lines
     //----------
+    ofPushStyle();
     ofSetColor(0);
 	ofNoFill();
+    ofSetLineWidth(5);
 	for (int i=0; i<mPLines.size(); i++) {
 		mPLines[i].draw();
 	}
 	for (int i=0; i<mPPolyLines.size(); i++) {
 		mPPolyLines[i].draw();
 	}
+    ofPopStyle();
     
     //----------
     // debug text
@@ -160,6 +171,7 @@ void testApp::draw(){
         s << "kinect angle: " << mKinectAngle << endl;
         s << "clip depth: " << mClipDepth << endl;
         s << "target id: " << mTargetID << endl;
+        s << "current rakugaki dir num: " << mRakugakiDirNum << endl;
         for (int i = 0; i < bFunc.size(); i++) s << "func " << i << ": " << bFunc[i] << endl;
         ofDrawBitmapString(s.str(), 10, 35);
         gui.draw();
@@ -292,13 +304,26 @@ void testApp::updateJump()
 
 void testApp::updatePachinco()
 {
-    if (bFunc[0]) {
-        int p = (int)(gui.getValueF(GUI_SLIDER_01) * 30) + 3;
-        if((int)ofRandom(0, p) == 0) {
+//    if (bFunc[0]) {
+//        int p = (int)(gui.getValueF(GUI_SLIDER_01) * 30) + 3;
+//        if((int)ofRandom(0, p) == 0) {
+//            psCircle c;
+//            c.ID = (int)ofRandom(mRakugakis.size());
+//            c.circle.setPhysics(1, 0.2, 0.8);
+//            c.circle.setup(mBox2d.getWorld(), ofRandom(ofGetWidth()), -100, 20);
+//            c.circle.setVelocity(ofRandom(-1, 1), 0);
+//            mPsCircles.push_back(c);
+//        }
+//    }
+    while (receiver.hasWaitingMessages()) {
+        ofxOscMessage m;
+        receiver.getNextMessage(&m);
+        if (m.getAddress() == "/play") {
             psCircle c;
-            c.ID = (int)ofRandom(mRakugakis.size());
-            c.circle.setPhysics(1, 0.2, 0.8);
-            c.circle.setup(mBox2d.getWorld(), ofRandom(ofGetWidth()), -100, 20);
+            c.ID = m.getArgAsInt32(0);
+            c.size = m.getArgAsFloat(1);
+            c.circle.setPhysics(1, 0.8, 0.8);
+            c.circle.setup(mBox2d.getWorld(), ofRandom(ofGetWidth()), -100, 100 * m.getArgAsFloat(1));
             c.circle.setVelocity(ofRandom(-1, 1), 0);
             mPsCircles.push_back(c);
         }
@@ -452,23 +477,23 @@ void testApp::drawPachinco()
             (*it).circle.setRadius((*it).circle.getRadius() - 0.1);
             it->life -= 3;
         }
-        if ((*it).circle.getRadius() <= 0) {
+        if ((*it).life <= 0) {
             it = mPsCircles.erase(it);
         } else {
             it++;
         }
     }
     // draw target image
-    if (mRakugakis.size()) {
-        float x = ofGetWidth() - 60;
-        float y = 60;
-        float r = 55;
-        ofSetColor(80, 127);
-        ofFill();
-        ofCircle(x, y, r);
-        ofSetColor(255);
-        mRakugakis[mTargetID].draw(x-r, y-r, r*2, r*2);
-    }
+//    if (mRakugakis.size()) {
+//        float x = ofGetWidth() - 60;
+//        float y = 60;
+//        float r = 55;
+//        ofSetColor(80, 127);
+//        ofFill();
+//        ofCircle(x, y, r);
+//        ofSetColor(255);
+//        mRakugakis[mTargetID].draw(x-r, y-r, r*2, r*2);
+//    }
 }
 
 void testApp::drawDoremi()
@@ -541,8 +566,18 @@ void testApp::keyPressed(int key){
             bDebugView = !bDebugView;
             break;
             
+        case 'a':
+            if (mRakugakiDirs.size())
+                mRakugakiDirNum = (mRakugakiDirNum - 1) % mRakugakiDirs.size();
+            break;
+            
+        case 's':
+            if (mRakugakiDirs.size())
+                mRakugakiDirNum = (mRakugakiDirNum + 1) % mRakugakiDirs.size();
+            break;
+            
         case 'r':
-            getAndSetRakugaki("rakugaki_test");
+            getAndSetRakugaki(mRakugakiDirs[mRakugakiDirNum]);
             break;
             
         case 'c':
